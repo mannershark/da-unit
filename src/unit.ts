@@ -2,6 +2,10 @@ const PowerSym = Symbol('Power');
 const EnergySym = Symbol('Energy');
 const TimeSym = Symbol('Time');
 
+function clone<T>(orig: T): T {
+    return Object.assign(Object.create(Object.getPrototypeOf(orig)), orig)
+}
+
 abstract class Unit<T extends Symbol> {
     constructor(
         protected readonly type: T,
@@ -9,19 +13,27 @@ abstract class Unit<T extends Symbol> {
     ) { }
 
     plus(other: Unit<T>) {
-        this.value += other.value;
+        const result = clone(this);
+        result.value += other.value;
+        return result;
     }
 
     minus(other: Unit<T>) {
-        this.value -= other.value;
+        const result = clone(this);
+        result.value -= other.value;
+        return result;
     }
 
-    mul(other: Unit<T>) {
-        this.value *= other.value;
+    mul(value: number) {
+        const result = clone(this);
+        result.value *= value;
+        return result;
     }
 
-    div(other: Unit<T>) {
-        this.value /= other.value;
+    div(value: number) {
+        const result = clone(this);
+        result.value /= value;
+        return result;
     }
 
 }
@@ -95,7 +107,7 @@ export class Time extends Unit<typeof TimeSym> {
         d: 24 * 3600,
         day: 24 * 3600,
         week: 168 * 3600,
-        year: 8766 * 3600
+        year: 8760 * 3600
     }
 
     constructor(value: number, unit: TimeUnits) {
