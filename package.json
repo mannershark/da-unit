@@ -1,0 +1,10 @@
+{
+    "name": "da-unit",
+    "version": "0.1.0",
+    "description": "Statically typed unit calculations",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "/dist"
+    ]
+}
