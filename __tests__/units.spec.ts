@@ -5,6 +5,7 @@ test('Converting power to energy', () => {
     const averageDemand = peakDemand.div(10);
     const yearlyEnergyUse = averageDemand.toEnergy(new Time(1, 'year'));
 
+    expect(peakDemand.toString()).toEqual('100 MW');
     expect(yearlyEnergyUse.get('MWh')).toEqual(87600);
-    expect(peakDemand.get('MW')).toEqual(100);
+    expect(yearlyEnergyUse.toString('MWh')).toEqual('87600 MWh');
 })

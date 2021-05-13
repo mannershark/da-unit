@@ -6,19 +6,25 @@ function clone<T>(orig: T): T {
     return Object.assign(Object.create(Object.getPrototypeOf(orig)), orig)
 }
 
-abstract class Unit<T extends Symbol> {
+abstract class Unit<T extends Symbol, U> {
+
+    public value: number;
+
     constructor(
         protected readonly type: T,
-        public value: number
-    ) { }
+        value: number,
+        public unit: U
+    ) {
+        this.value = value * this.constructor['units'][unit];
+    }
 
-    plus(other: Unit<T>) {
+    plus(other: this) {
         const result = clone(this);
         result.value += other.value;
         return result;
     }
 
-    minus(other: Unit<T>) {
+    minus(other: this) {
         const result = clone(this);
         result.value -= other.value;
         return result;
@@ -36,11 +42,21 @@ abstract class Unit<T extends Symbol> {
         return result;
     }
 
+    /**
+     * Retrieve value as specific unit
+     */
+    get(unit: U) {
+        return this.value / this.constructor['units'][unit];
+    }
+
+    toString(unit = this.unit) {
+        return `${this.get(unit)} ${unit}`;
+    }
 }
 
 type EnergyUnits = keyof typeof Energy.units;
 
-export class Energy extends Unit<typeof EnergySym> {
+export class Energy extends Unit<typeof EnergySym, EnergyUnits> {
 
     public static units = {
         J: 1,
@@ -53,21 +69,17 @@ export class Energy extends Unit<typeof EnergySym> {
     };
 
     constructor(value: number, unit: EnergyUnits = 'J') {
-        super(EnergySym, value * Energy.units[unit]);
-    }
-
-    get(unit: EnergyUnits) {
-        return this.value / Energy.units[unit];
+        super(EnergySym, value, unit);
     }
 
     toPower(time: Time) {
-        return new Power(this.value / time.value)
+        return new Power(this.value / time.value);
     }
 }
 
 type PowerUnits = keyof typeof Power.units;
 
-export class Power extends Unit<typeof PowerSym> {
+export class Power extends Unit<typeof PowerSym, PowerUnits> {
 
     public static units = {
         W: 1,
@@ -77,11 +89,7 @@ export class Power extends Unit<typeof PowerSym> {
     };
 
     constructor(value: number, unit: PowerUnits = 'W') {
-        super(PowerSym, value * Power.units[unit]);
-    }
-
-    get(unit: PowerUnits) {
-        return this.value / Power.units[unit];
+        super(PowerSym, value, unit);
     }
 
     toEnergy(time: Time) {
@@ -91,7 +99,7 @@ export class Power extends Unit<typeof PowerSym> {
 
 type TimeUnits = keyof typeof Time.units;
 
-export class Time extends Unit<typeof TimeSym> {
+export class Time extends Unit<typeof TimeSym, TimeUnits> {
 
     public static units = {
         ms: 1e-3,
@@ -111,10 +119,6 @@ export class Time extends Unit<typeof TimeSym> {
     }
 
     constructor(value: number, unit: TimeUnits) {
-        super(TimeSym, value * Time.units[unit]);
-    }
-
-    get(unit: TimeUnits) {
-        return this.value / Time.units[unit];
+        super(TimeSym, value, unit);
     }
 }
